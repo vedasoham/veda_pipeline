@@ -1,0 +1,50 @@
+# VEDA tool mirror configuration
+#
+# Copy this file to  installer/mirror.conf  and set MIRROR to where you
+# uploaded the bundle produced by ./veda-pack. Once it is committed, every
+# later install is just:  ./install.sh
+#
+# Override at any time with:  ./install.sh --mirror <url>
+#                             VEDA_MIRROR=<url> ./install.sh
+# Disable with:               ./install.sh --no-mirror
+#
+# The installer verifies every download against installer/manifest/mirror.manifest,
+# so this file holds no secrets and is safe to commit.
+
+# ---------------------------------------------------------------------------
+# RECOMMENDED: GitHub Release assets on a PRIVATE repository
+# ---------------------------------------------------------------------------
+# 2 GiB per asset, assets live outside git history, CDN-backed and resumable,
+# versioned by tag, and a private repo keeps the DTU-licensed tools behind
+# your own access control. Collaborators run `gh auth login` once.
+#
+#   ./veda-pack --upload gh://your-org/veda-tools@tools-v1
+#
+MIRROR=gh://your-org/veda-tools@tools-v1
+
+# ---------------------------------------------------------------------------
+# Alternatives
+# ---------------------------------------------------------------------------
+
+# Any web server, S3, Cloudflare R2, Backblaze B2, institutional space.
+# Each tool is fetched from <base>/<filename>. Simplest and most predictable.
+# MIRROR=https://files.your-lab.example/veda/tools-v1/
+
+# Google Drive, via gdown. Works, but every VEDA archive is over Drive's
+# ~25 MB virus-scan threshold, and Drive applies frequency-based quota
+# lockouts (HTTP 403/429, up to ~24h) that will bite when several people
+# install on the same day. Not recommended for shared use.
+# MIRROR=gdrive://1AbCdEfGhIjKlMnOpQrStUvWxYz
+
+# Any rclone remote. Goes through the provider's real API, so it avoids
+# Drive's interstitial and public-link quota completely. The best way to
+# actually use Drive/OneDrive/Dropbox. Needs `rclone config` once.
+# MIRROR=rclone://gdrive:veda/tools-v1
+
+# ---------------------------------------------------------------------------
+# Licence reminder
+# ---------------------------------------------------------------------------
+# NetMHCpan, NetMHCIIpan, GibbsCluster, Seq2Logo and DeepLoc are licensed by
+# DTU Health Tech for your own academic use and may NOT be redistributed.
+# If your bundle includes them, the mirror must be access-controlled. Use
+# ./veda-pack --free-only to build a bundle that is safe to host publicly.

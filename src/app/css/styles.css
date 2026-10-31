@@ -1,0 +1,176 @@
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e3f2fd 0%, #b2dfdb 100%);
+    color: #333;
+    line-height: 1.5; /* Slightly reduced line height */
+    font-size: 0.9rem; /* Base font size for the entire app */
+}
+
+/* Reduce top padding of the main content area to bring header up */
+.block-container {
+    padding-top: 1rem; /* Reduced from 1.5rem */
+}
+
+/* Container for the initial project selection screen */
+.project-selection-container {
+    max-width: 60%;
+    margin: 0 auto; /* Center the container */
+}
+
+
+/* IEL Logo */
+.IEL-logo {
+    display: inline-block;
+    font-size: 2.5rem; /* Reduced from 3.5rem */
+    font-weight: 1000;
+    background: linear-gradient(45deg, #00acc1, #26a69a, #4db6ac);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    margin-right: 0.8rem; /* Reduced from 1rem */
+    position: relative;
+}
+.IEL-logo::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; /* Adjusted */
+    left: 0;
+    width: 100%;
+    height: 2px; /* Reduced from 3px */
+    background: linear-gradient(90deg, #00acc1, #26a69a);
+    border-radius: 1px; /* Adjusted */
+}
+
+/* Main Header */
+.main-header {
+    background: linear-gradient(135deg, #00acc1 0%, #26a69a 50%, #4db6ac 100%);
+    padding: 0.6rem; /* Reduced from 0.8rem */
+    border-radius: 8px; /* Reduced from 10px */
+    color: white;
+    text-align: center;
+    margin-bottom: 1.5rem; /* Reduced from 2rem */
+    box-shadow: 0 6px 20px rgba(0, 172, 193, 0.2); /* Reduced shadow */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.main-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 3s infinite;
+}
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+.main-header h1 {
+    font-size: 2.2rem; /* Reduced from 3.0rem */
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Reduced shadow */
+}
+
+/* Step Containers */
+.step-container {
+    border: none;
+    border-radius: 10px; /* Reduced from 15px */
+    padding: 1.5rem; /* Reduced from 2rem */
+    margin: 1rem 0; /* Reduced from 1.5rem 0 */
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08); /* Reduced shadow */
+    transition: all 0.3s ease;
+    position: relative;
+}
+.step-container:hover {
+    transform: translateY(-3px); /* Reduced from -5px */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12); /* Reduced shadow */
+}
+.step-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px; /* Reduced from 5px */
+    background: linear-gradient(90deg, #00acc1, #26a69a, #4db6ac);
+    border-radius: 10px 10px 0 0; /* Adjusted */
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(135deg, #00acc1, #26a69a);
+    color: white;
+    border: none;
+    border-radius: 8px; /* Reduced from 15px */
+    padding: 0.25rem 0.5rem; /* Reduced from 0.4rem 1.0rem */
+    font-size: 0.75rem; /* Reduced from 0.85rem */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 172, 193, 0.2); /* Reduced shadow */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.stButton > button:hover {
+    transform: translateY(-1px); /* Reduced from -2px */
+    box-shadow: 0 4px 12px rgba(0, 172, 193, 0.3); /* Reduced shadow */
+    background: linear-gradient(135deg, #0097a7, #1b9e77);
+}
+.stButton > button:active {
+    transform: translateY(0);
+}
+
+/* Subtle Button Style for specific actions like "Process New File" */
+.subtle-button > button {
+    background: #f0f2f6; /* Light grey */
+    color: #555;
+    border: 1px solid #ccc; /* Kept same */
+    border-radius: 4px; /* Reduced from 5px */
+    padding: 0.4rem 1rem; /* Reduced from 0.5rem 1.5rem */
+    font-size: 0.8rem; /* Reduced from 0.9rem */
+    font-weight: 400;
+    text-transform: none; /* Remove uppercase */
+    letter-spacing: normal;
+    box-shadow: none; /* Remove shadow */
+}
+.subtle-button > button:hover {
+    background: #e0e2e6; /* Slightly darker grey on hover */
+    box-shadow: none;
+}
+
+/* File Uploader */
+.stFileUploader {
+    border: 2px dashed #00acc1; /* Kept same */
+    border-radius: 8px; /* Reduced from 10px */
+    padding: 0.8rem; /* Reduced from 1rem */
+    background: rgba(0, 172, 193, 0.05);
+    transition: all 0.3s ease;
+}
+.stFileUploader:hover {
+    border-color: #26a69a;
+    background: rgba(38, 166, 154, 0.1);
+}
+
+/* Disable copy/paste for the "Fetched Protein Details" table.
+   This targets the dataframe that immediately follows the h3 subheader. */
+h3:has(span:contains("Fetched Protein Details")) + .stDataFrame .ag-cell {
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* IE/Edge */
+}
+
+/* Sidebar */
+.css-1d391kg {
+    background: linear-gradient(180deg, #00acc1 0%, #26a69a 100%);
+    color: white;
+}

@@ -1,0 +1,38 @@
+# VEDA :: main UI environment (Streamlit app, dashboards, DeepLoc2 host)
+#
+# IMPORTANT -- why the split between conda and pip:
+#
+# Streamlit, protobuf and friends are PyPI packages. Asking conda-forge to
+# satisfy them pulls pyarrow 7-9, which require libprotobuf 3.19-3.21, and
+# that contradicts any modern protobuf -- the solve becomes unsatisfiable.
+# So: conda provides Python and the compiled numeric stack (proper BLAS),
+# pip provides everything that lives naturally on PyPI.
+#
+# Also installed separately by installer/lib/envs.sh:
+#   torch              -- CUDA or CPU wheel chosen per machine
+#   veda-ui.pip.txt    -- the PyPI packages (see that file for why)
+#   DeepLoc2   -- from resources/tools/deeploc-2.1.All
+name: veda-ui
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  # setuptools<81 is REQUIRED, not conservatism.
+  #
+  # setuptools removed the bundled `pkg_resources` module after 80.x. DeepLoc2
+  # imports it directly -- deploc2_package/DeepLoc2/deeploc2.py and model.py
+  # both do `import pkg_resources` -- so a modern setuptools makes DeepLoc2
+  # fail at runtime with ModuleNotFoundError, long after the install reported
+  # success. 80.9.0 is the last version that still ships it.
+  - setuptools<81
+  # --- compiled numerics. numpy held at 1.26.x: torch 2.5 and onnxruntime
+  #     both break against numpy 2.x ---
+  - numpy=1.26.*
+  - pandas=2.*
+  - scipy=1.13.*
+  - scikit-learn=1.7.*
+  - joblib
+  - biopython
+  - openpyxl
+  - matplotlib-base            # -base avoids pulling Qt into the solve

@@ -1,0 +1,45 @@
+# VEDA tool registry
+#
+# One record per line, pipe-delimited:
+#
+#   id | kind | dir | sentinel | source | help_url | label
+#
+#   id       short handle used by --only-tool and the doctor report
+#   kind     free    = public git repo, installer clones it unattended
+#            lfs     = public git repo whose models live in git-lfs
+#            archive = direct URL to a .tar.gz/.zip, downloaded and unpacked.
+#                      Used when a tool's git repository does not contain
+#                      everything it needs -- toxinpred2 is the case in point:
+#                      RF_model (204 MB) is absent from GitHub entirely and
+#                      ships only in the author's standalone package, so a
+#                      clone yields a tool that cannot predict.
+#            dtu     = licence-gated (DTU Health Tech); staged by hand
+#            docker  = container image, pulled from a registry
+#   dir      directory under resources/tools/ (or image ref, for kind=docker)
+#   sentinel path inside dir that must exist for the tool to count as present.
+#            Pick something the tool cannot run without -- a model file beats a
+#            launcher script, because a launcher can be present while the data
+#            it needs is not.
+#   source   git URL (free/lfs), archive URL (archive), or image ref (docker)
+#   help_url page a human must visit when kind=dtu and the tool is missing
+#   label    human-readable name for logs
+#
+# Blank lines and #-comments are ignored. Field order matters; keep the pipes.
+
+# --- freely redistributable: downloaded automatically -----------------------
+algpred2|lfs|algpred2|rf_model|https://github.com/raghavagps/algpred2|https://webs.iiitd.edu.in/raghava/algpred2/download.php|AlgPred 2.0 (allergenicity)
+toxinpred2|archive|toxinpred2|RF_model|https://webs.iiitd.edu.in/raghava/toxinpred2/toxinpred2.tar.gz|https://webs.iiitd.edu.in/raghava/toxinpred2/stand.html|ToxinPred 2.0 (toxicity)
+il2pred|lfs|il2pred-main|il2pred.py|https://github.com/raghavagps/il2pred|https://webs.iiitd.edu.in/raghava/il2pred/download.php|IL2Pred (IL-2 inducers)
+il4pred2|lfs|il4pred2-main|il4pred2.py|https://github.com/raghavagps/il4pred2|https://webs.iiitd.edu.in/raghava/il4pred2/download.html|IL4Pred 2.0 (IL-4 inducers)
+ifnepitope2|lfs|ifnepitope2-main|ifnepitope2.py|https://github.com/raghavagps/ifnepitope2|https://webs.iiitd.edu.in/raghava/ifnepitope2/download.php|IFNEpitope 2.0 (IFN-gamma inducers)
+vaxign|free|Vaxign-ML-docker|VaxignML.sh|https://github.com/VIOLINet/Vaxign-ML-docker|https://github.com/VIOLINet/Vaxign-ML-docker|Vaxign-ML (protegenicity)
+
+# --- licence-gated: personal download link, cannot be fetched by a script ---
+netmhcpan|dtu|netMHCpan-4.2|Linux_x86_64/bin/netMHCpan-4.2|-|https://services.healthtech.dtu.dk/services/NetMHCpan-4.2/|NetMHCpan 4.2 (MHC-I binding)
+netmhciipan|dtu|netMHCIIpan-4.3|Linux_x86_64/bin/NetMHCIIpan-4.3|-|https://services.healthtech.dtu.dk/services/NetMHCIIpan-4.3/|NetMHCIIpan 4.3 (MHC-II binding)
+gibbscluster|dtu|gibbscluster-2.0|bin/gibbs_cluster_1.2.2_DB.Linux_x86_64|-|https://services.healthtech.dtu.dk/services/GibbsCluster-2.0/|GibbsCluster 2.0 (motif clustering)
+seq2logo|dtu|seq2logo-2.2|Seq2Logo.py|-|https://services.healthtech.dtu.dk/services/Seq2Logo-2.0/|Seq2Logo 2.2 (sequence logos)
+deeploc|dtu|deeploc-2.1.All|deeploc2_package/setup.py|-|https://services.healthtech.dtu.dk/services/DeepLoc-2.1/|DeepLoc 2.1 (subcellular localisation)
+
+# --- container images -------------------------------------------------------
+vaxign-image|docker|e4ong1031/vaxign-ml:latest|-|e4ong1031/vaxign-ml:latest|-|Vaxign-ML container

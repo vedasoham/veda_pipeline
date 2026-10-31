@@ -1,0 +1,31 @@
+# VEDA :: veda-ui PyPI dependencies
+#
+# These are installed by installer/lib/envs.sh with PYTHONNOUSERSITE=1, NOT
+# through a `pip:` section in the yml. Two reasons:
+#
+#  1. Asking conda-forge for these drags in pyarrow 7-9 / libprotobuf 3.x and
+#     makes the solve unsatisfiable.
+#  2. Without PYTHONNOUSERSITE=1, pip reports them "already satisfied" from
+#     ~/.local/lib/python3.10/site-packages and installs nothing into the env,
+#     leaving a silently empty environment that still appears to work.
+#
+# torch is NOT here: envs.sh picks the CUDA or CPU wheel per machine.
+# DeepLoc2 is NOT here: it is installed from resources/tools/deeploc-2.1.All.
+
+streamlit==1.52.1
+plotly==6.3.0
+matplotlib-venn==1.1.2
+pybiolib==1.2.1602
+
+# DeepLoc2 runtime dependencies
+onnxruntime==1.23.2
+fair-esm==2.0.0
+transformers==5.5.1
+pytorch-lightning==2.5.0
+sentencepiece==0.2.1
+
+# misc runtime
+watchdog
+psutil
+requests
+tqdm

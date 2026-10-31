@@ -1,0 +1,25 @@
+# VEDA :: IFNEpitope2 environment  (config.IFNEPITOPE_PYTHON)
+#
+# ifnepitope2.py imports numpy, pandas, sklearn, tqdm and pkg_resources
+# (the last from setuptools) -- all four are required, and tqdm/setuptools
+# are easy to miss because they only surface at run time.
+#
+# Kept on a separate interpreter from veda-tools so its scikit-learn pin can
+# move independently. BLAST is deliberately absent: ifnepitope_worker.py
+# resolves blastp from config.TOOL_PYTHON's bin/ (the veda-tools env).
+name: veda-ifn
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  # setuptools<81 is REQUIRED: ifnepitope2.py line 9 is `import pkg_resources`,
+  # and setuptools stopped bundling pkg_resources after 80.x. Without the bound
+  # the solver takes the newest (84.x), and the tool dies with
+  # ModuleNotFoundError: No module named 'pkg_resources'.
+  - setuptools<81
+  - numpy=1.26.*
+  - pandas=2.*
+  - joblib
+  - scikit-learn=1.7.*
+  - tqdm                       # imported directly by ifnepitope2.py

@@ -1,0 +1,104 @@
+# VEDA -- what goes into the public repository
+#
+# This file is an ALLOWLIST: it ignores everything, then names the software to
+# include. It is written this way deliberately.
+#
+# This directory is a live research working directory, not a clean source tree.
+# It currently holds, alongside the code:
+#
+#   runs_done/     19 GB of completed analyses (Hela_MHCI, lismo_april,
+#                  run_for-proposal, TA_tau, TA_indi, ...)
+#   data/          89 MB of in-progress output
+#   *.xlsx         raw proteomics input and result workbooks
+#   *.docx         a manuscript draft
+#   resources/tools/  1.7 GB of third-party programs, five of them licensed
+#                     to an individual and not redistributable
+#
+# A conventional "ignore the bad things" list was tried first and missed
+# `data/` subfolders and `runs_done/` entirely -- directories that simply had
+# not been thought of. The failure is one-directional and permanent: anything
+# unanticipated gets published, git history cannot be edited afterwards
+# without invalidating every clone, and what leaks is unpublished research.
+#
+# So the default is exclude, and each inclusion below is a deliberate choice.
+# ADDING A NEW FILE TO THE REPO MEANS ADDING A LINE HERE. That is the point:
+# the inconvenience is the safety mechanism.
+
+# --- 1. Ignore everything at the top level ---------------------------------
+/*
+
+# --- 2. The software ------------------------------------------------------
+!/.gitignore
+!/README.md
+!/INSTALL.md
+!/install.sh
+!/uninstall.sh
+!/veda-doctor
+!/veda-pack
+!/src
+!/installer
+!/dashboard
+
+# --- 3. resources/: the interface images, and the tools DOCUMENTATION only -
+# The tools themselves are fetched by the installer and must never be
+# committed. resources/tools/.gitignore repeats this locally.
+!/resources
+/resources/*
+!/resources/*.png
+!/resources/tools
+/resources/tools/*
+!/resources/tools/.gitignore
+!/resources/tools/README.md
+!/resources/tools/DTU_TOOLS.md
+
+# --- 4. Never, even inside the directories above ---------------------------
+__pycache__/
+*.py[cod]
+
+# Editor/agent tooling that happens to live under src/.
+#
+# src/.claude/skills/ and src/.agents/skills/ hold symlinks into
+# ~/.local/lib/pythonX.Y/site-packages/streamlit/.agents/skills/ -- Streamlit's
+# own bundled skill, not part of VEDA. They must not be published:
+#   * the link is relative and seven levels deep, so it only resolves from the
+#     directory depth it was created at and breaks in any clone elsewhere;
+#   * it points into ~/.local, which VEDA deliberately isolates itself from;
+#   * it is local developer tooling, not something a researcher needs.
+.claude/
+.agents/
+*.veda-orig
+*.replaced-*
+.DS_Store
+._*
+__MACOSX/
+
+# veda_paths.json is generated per machine by the configure stage.
+veda_paths.json
+
+# Bundles built by veda-pack. A bundle without --free-only contains
+# DTU-licensed programs and belongs only on access-controlled storage.
+dist/
+
+# A mirror URL can embed a token or name private infrastructure.
+# installer/mirror.conf.example is committed in its place.
+installer/mirror.conf
+
+# --- Deliberately NOT included, and why ------------------------------------
+#
+#   setup.sh          An older installer that downloads and installs
+#                     Miniconda and builds differently named environments.
+#                     Publishing it would send researchers down a path that
+#                     fights install.sh. The file is left on disk; it is
+#                     simply not published.
+#   requirements.txt  Not a pip requirements file -- it is a scratch note
+#                     containing commands such as
+#                     `conda remove -n deeptmhmm --all -y`. Harmful if a
+#                     researcher pasted it. The real dependency specs are
+#                     installer/envs/*.yml and *.pip.txt.
+#   data/, runs_done/ Research data and results. See the note at the top.
+#   *.xlsx, *.docx    Raw data and a manuscript draft.
+#   logs/             Machine-local.
+#
+# To ship an example dataset, create an `examples/` directory with files
+# chosen on purpose and add `!/examples` above. Do not un-ignore part of
+# data/ or runs_done/ to do it.

@@ -1,0 +1,29 @@
+# VEDA :: shared "specialist" environment for the Raghava-lab predictors.
+#
+# Used by: AlgPred2, ToxinPred2, IL2Pred, IL4Pred2  (config.TOOL_PYTHON)
+#
+# Those scripts import only joblib/numpy/pandas/pickle, but the model files
+# they unpickle (rf_model, RF_model) contain scikit-learn estimators, so
+# scikit-learn must be present AND version-compatible. The 1.5.* pin is
+# load-bearing -- do not float it, and keep numpy below 2.x for the same
+# reason (the pickles predate the numpy 2 ABI change).
+#
+# This env also owns blastp/makeblastdb: the workers locate BLAST as
+# Path(config.TOOL_PYTHON).parent / "blastp", i.e. inside this env's bin/.
+name: veda-tools
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.9
+  - pip
+  # See veda-ui.yml: setuptools after 80.x no longer bundles pkg_resources.
+  # Python 3.9 happens to cap setuptools below that today, but pinning means
+  # this env does not silently break when that stops being true.
+  - setuptools<81
+  - numpy=1.26.*
+  - pandas=2.*
+  - joblib
+  - scikit-learn=1.5.*         # load-bearing: unpickles the RF models
+  - blast                      # provides blastp + makeblastdb in this env
+  - perl                       # MERCI_motif_locator.pl

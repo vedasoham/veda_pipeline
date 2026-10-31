@@ -1,0 +1,17 @@
+# VEDA :: DeepTMHMM worker environment  (config.TMHMM_PYTHON)
+#
+# Runs backend/workers/tmhmm_worker.py, which shells out to DTU/DeepTMHMM
+# through pybiolib. That worker imports only biolib and typing_extensions --
+# no pandas, numpy, scipy or scikit-learn. Keeping this env minimal is
+# deliberate: it solves in seconds and there is nothing to conflict.
+#
+# PyPI deps live in veda-tmhmm.pip.txt, installed by envs.sh.
+#
+# It stays on its own Python because pybiolib's dependency set does not
+# co-exist cleanly with the UI environment.
+name: veda-tmhmm
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip

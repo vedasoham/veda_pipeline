@@ -1,0 +1,14 @@
+# Belt and braces.
+#
+# The repository root .gitignore already excludes everything in this directory
+# except the documentation. This second file repeats the rule locally so that
+# the protection survives someone editing the root file, moving this directory
+# into another project, or running `git add` from inside here.
+#
+# If you are about to add an exception: do not add one for a DTU Health Tech
+# tool. Those are licensed to you personally and may not be redistributed.
+# See DTU_TOOLS.md.
+*
+!.gitignore
+!README.md
+!DTU_TOOLS.md

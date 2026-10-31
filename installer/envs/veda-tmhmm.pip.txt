@@ -1,0 +1,10 @@
+# VEDA :: veda-tmhmm PyPI dependencies
+#
+# Installed by installer/lib/envs.sh with PYTHONNOUSERSITE=1 so pip resolves
+# against this environment rather than ~/.local.
+#
+# tmhmm_worker.py and tmhmm_runner.py import nothing else -- no pandas,
+# numpy, scipy or scikit-learn.
+
+pybiolib==1.2.1602
+typing_extensions

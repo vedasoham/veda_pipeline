@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+#
+#  veda-doctor -- check an existing VEDA installation
+#
+#  Runs the same verification suite as the end of ./install.sh, on demand.
+#  Use it after staging a licence-gated tool, after a system update, or when
+#  a pipeline step starts failing and you want to know whether the tool or
+#  the pipeline is at fault.
+#
+#  Usage:  ./veda-doctor [-v] [--json] [--system]
+#          veda doctor
+#
+#    -v         show the command output behind each check
+#    --json     machine-readable report
+#    --system   probe the machine instead of the install: distro, existing
+#               Anaconda, GPU driver and the PyTorch build it implies,
+#               Docker, apt package names for this release, and any
+#               environment variable that would leak into the workers.
+#               Works before VEDA is installed. Run it first on a new box.
+#
+#  Exit status: 0 = everything installed also works
+#               1 = at least one installed component is broken
+#  Tools that are simply not installed are reported as unavailable, not failed.
+#
+set -Eeuo pipefail
+
+VEDA_SELF=${BASH_SOURCE[0]}
+while [[ -L "$VEDA_SELF" ]]; do
+    _link=$(readlink "$VEDA_SELF")
+    [[ "$_link" == /* ]] && VEDA_SELF=$_link || VEDA_SELF=$(dirname "$VEDA_SELF")/$_link
+done
+VEDA_APP_DIR=$(cd "$(dirname "$VEDA_SELF")" && pwd -P)
+VEDA_INSTALLER_DIR="$VEDA_APP_DIR/installer"
+VEDA_TOOLS_DIR="$VEDA_APP_DIR/resources/tools"
+
+if [[ ! -d "$VEDA_INSTALLER_DIR/lib" ]]; then
+    printf '\nFATAL: %s needs the installer/ directory next to it.\n' "$(basename "$VEDA_SELF")" >&2
+    printf 'Looked for: %s\n' "$VEDA_INSTALLER_DIR/lib" >&2
+    printf 'Run it from a complete VEDA checkout, not a copied single file.\n\n' >&2
+    exit 1
+fi
+
+VEDA_HOME=${VEDA_HOME:-$HOME/.veda}
+VEDA_MAMBA_ROOT="$VEDA_HOME/mamba"
+VEDA_MAMBA_BIN="$VEDA_HOME/bin/micromamba"
+VEDA_STATE="$VEDA_HOME/state"
+VEDA_STAGING="$VEDA_HOME/staging"
+
+VEDA_VERBOSE=0
+VEDA_JSON=0
+VEDA_FORCE=0
+VEDA_ASSUME_YES=1
+VEDA_DRY_RUN=0
+VEDA_SYSTEM=0
+VEDA_CPU_ONLY=0
+
+# Derived the same way installer/lib/launcher.sh derives it, so the launcher
+# check looks for the command that was actually generated. An install into
+# ~/.veda-test produces `veda-test`, not `veda`.
+VEDA_CMD=$(basename "$VEDA_HOME"); VEDA_CMD=${VEDA_CMD#.}
+[[ -z "$VEDA_CMD" ]] && VEDA_CMD=veda
+
+while (( $# )); do
+    case $1 in
+        -v|--verbose) VEDA_VERBOSE=1 ;;
+        --json)       VEDA_JSON=1 ;;
+        --system)     VEDA_SYSTEM=1 ;;
+        -h|--help)
+            sed -n '2,18p' "$VEDA_SELF" | sed 's/^#\s\?//'
+            exit 0 ;;
+        *) printf 'Unknown option: %s (try --help)\n' "$1" >&2; exit 2 ;;
+    esac
+    shift
+done
+
+mkdir -p "$VEDA_HOME/logs" "$VEDA_HOME/tmp"
+VEDA_LOG="$VEDA_HOME/logs/doctor-$(date '+%Y%m%d-%H%M%S').log"
+: >"$VEDA_LOG"
+
+for _lib in common probe mamba verify; do
+    _path="$VEDA_INSTALLER_DIR/lib/$_lib.sh"
+    [[ -f "$_path" ]] || { printf 'FATAL: missing %s\n' "$_path" >&2; exit 1; }
+    # shellcheck source=/dev/null
+    . "$_path"
+done
+
+# --system re-runs the installer's system probe and stops. Useful before
+# installing on a new machine, and as the first thing to run when a working
+# install starts behaving differently -- it reports a changed GPU driver, a
+# newly activated Anaconda, or a package that a distro upgrade renamed.
+# It does not need VEDA to be installed.
+if (( VEDA_SYSTEM )); then
+    veda::probe
+    exit 0
+fi
+
+if [[ ! -d "$VEDA_MAMBA_ROOT/envs" ]]; then
+    printf 'VEDA does not appear to be installed (%s is missing).\n' "$VEDA_MAMBA_ROOT/envs" >&2
+    printf 'Run the installer first:  %s/install.sh\n' "$VEDA_APP_DIR" >&2
+    exit 1
+fi
+
+rc=0
+
+if (( VEDA_JSON )); then
+    # Quiet the human-readable output, emit a machine-readable report instead.
+    veda::verify >/dev/null 2>&1 || rc=1
+    printf '{\n  "generated": "%s",\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')"
+    printf '  "app_dir": "%s",\n  "veda_home": "%s",\n' "$VEDA_APP_DIR" "$VEDA_HOME"
+    printf '  "passed": %d,\n  "failed": %d,\n  "unavailable": %d,\n' \
+        "$VEDA_CHK_PASS" "$VEDA_CHK_FAIL" "$VEDA_CHK_SKIP"
+    printf '  "checks": [\n'
+    first=1
+    for row in "${VEDA_CHK_REPORT[@]}"; do
+        IFS='|' read -r st cls label detail <<<"$row"
+        (( first )) || printf ',\n'
+        first=0
+        # Escape the few characters that can appear in tool output.
+        detail=${detail//\\/\\\\}; detail=${detail//\"/\\\"}
+        detail=${detail//$'\n'/ }; detail=${detail//$'\t'/ }
+        printf '    {"status": "%s", "class": "%s", "name": "%s", "detail": "%s"}' \
+            "$st" "$cls" "$label" "$detail"
+    done
+    printf '\n  ]\n}\n'
+    exit "$rc"
+fi
+
+banner "VEDA doctor"
+log "project : $VEDA_APP_DIR"
+log "home    : $VEDA_HOME"
+log "log     : $VEDA_LOG"
+
+veda::verify || rc=1
+
+if (( rc == 0 )); then
+    printf '\n   %sInstallation is healthy.%s\n\n' "$C_GREEN$C_BOLD" "$C_RESET"
+else
+    printf '\n   %sSomething is broken.%s Common fixes:\n' "$C_RED$C_BOLD" "$C_RESET"
+    printf '     environments   ./install.sh --from envs --force\n'
+    printf '     tool paths     ./install.sh --only configure\n'
+    printf '     a single tool  ./install.sh --only tools --only-tool <id> --force\n'
+    printf '     docker images  ./install.sh --only docker\n\n'
+fi
+
+exit "$rc"
