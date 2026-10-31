@@ -10,8 +10,8 @@ Streamlit application with a browser interface; the prediction tools run as
 separate processes in their own pinned environments.
 
 ```bash
-git clone https://github.com/<owner>/veda.git
-cd veda
+git clone https://github.com/vedasoham/veda_pipeline.git
+cd veda_pipeline
 ./install.sh
 veda
 ```
